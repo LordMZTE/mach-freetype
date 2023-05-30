@@ -38,9 +38,10 @@ pub fn build(b: *Build) !void {
     test_exe.linkLibrary(ft_dep.artifact("freetype"));
     test_exe.linkLibrary(hb_dep.artifact("harfbuzz"));
     test_exe.addModule("font_assets", font_assets_mod);
-
+    
+    const run_main_tests = b.addRunArtifact(test_exe);
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&b.addRunArtifact(test_exe).step);
+    test_step.dependOn(&run_main_tests.step);
 
     inline for ([_][]const u8{
         "single-glyph",
@@ -59,7 +60,7 @@ pub fn build(b: *Build) !void {
         example_exe.linkLibrary(hb_dep.artifact("harfbuzz"));
         example_exe.addModule("font_assets", font_assets_mod);
 
-        const example_install = b.addInstallArtifact(example_exe);
+        const example_install = b.addRunArtifact(example_exe);
 
         var example_compile_step = b.step("example-" ++ example, "Compile '" ++ example ++ "' example");
         example_compile_step.dependOn(&example_install.step);
